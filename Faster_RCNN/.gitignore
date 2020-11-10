@@ -139,8 +139,7 @@ cython_debug/
 
 # datasets
 cocodata/
-
-
+openimagesdata/
 
 # IDEA
 .idea/

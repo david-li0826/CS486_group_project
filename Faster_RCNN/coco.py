@@ -29,14 +29,14 @@ class CocoSet(torch.utils.data.Dataset):
         num_objs = len(coco_annotation)
 
         if num_objs == 0:
-            print("background images")
             width, height = img.size
-            boxes = torch.as_tensor([[0, 0, width, height]])
-            labels = torch.ones((1,), dtype=torch.int64)
+            boxes = torch.as_tensor([[0, 0, width, height]], dtype=torch.float32)
+            # treat background as a new category id 100
+            labels = torch.tensor([100], dtype=torch.int64)
             # Tensorise img_id
             img_id = torch.tensor([img_id])
-            areas =(boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
-            iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+            areas = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+            iscrowd = torch.ones((num_objs,), dtype=torch.int64)
         else:
             # Bounding boxes for objects
             # In coco format, bbox = [xmin, ymin, width, height]
@@ -49,8 +49,11 @@ class CocoSet(torch.utils.data.Dataset):
                 ymax = ymin + coco_annotation[i]["bbox"][3]
                 boxes.append([xmin, ymin, xmax, ymax])
             boxes = torch.as_tensor(boxes, dtype=torch.float32)
-            # Labels (In my case, I only one class: target class or background)
-            labels = torch.ones((num_objs,), dtype=torch.int64)
+            # Labels
+            labels = []
+            for i in range(num_objs):
+                labels.append(coco_annotation[i]["category_id"])
+            labels = torch.as_tensor(labels, dtype=torch.int64)
             # Tensorise img_id
             img_id = torch.tensor([img_id])
             # Size of bbox (Rectangular)

@@ -19,8 +19,8 @@ def get_transforms():
 
 def train():
     dataset = CocoSet(
-        root=config.train_data_dir,
-        annotation=config.train_ann_file,
+        root=config.coco_train_data_dir,
+        annotation=config.coco_train_ann_file,
         transforms=get_transforms()
     )
 
