@@ -14,29 +14,43 @@ class OpenSet(torch.utils.data.Dataset):
         self.transforms = transforms
         self.open = collections.defaultdict(dict)
         self.ids = []
+        self.label_to_id = {}
+        self.image_id_to_id = {}
         if annotation is not None:
             print('loading annotations into memory...')
             tic = time.time()
             self.dataset = pd.read_csv(os.path.join(annotation))
             self.dataset = self.dataset.drop_duplicates('ImageID', keep='last').reset_index(drop=True)
+            count = 1
+            count_image = 1
             for index, row in tqdm(self.dataset.iterrows(), total=len(self.dataset)):
                 image_id = row['ImageID']
                 if image_id in self.open:
+                    labelname = row['LabelName']
                     ann = {
                         'bbox': [row['XMin'], row['XMax'], row['YMin'], row['YMax']],
-                        'label': row['LabelName']
+                        'label': labelname
                     }
                     self.open[image_id]['annotations'].append(ann)
+                    if labelname not in self.label_to_id:
+                        self.label_to_id[labelname] = count
+                        count += 1
                 else:
                     image_path = os.path.join(self.root, image_id)
                     if os.path.exists(image_path + '.jpg'):
+                        labelname = row['LabelName']
                         ann = {
                             'bbox': [row['XMin'], row['XMax'], row['YMin'], row['YMax']],
-                            'label': row['LabelName']
+                            'label': labelname
                         }
                         self.open[image_id]['image_path'] = image_path + '.jpg'
                         self.open[image_id]['annotations'] = [ann]
                         self.ids.append(image_id)
+                        self.image_id_to_id[image_id] = count_image
+                        count_image += 1
+                        if labelname not in self.label_to_id:
+                            self.label_to_id[labelname] = count
+                            count += 1
             self.ids = sorted(self.ids)
             print('Done (t={:0.2f}s)'.format(time.time() - tic))
 
@@ -53,19 +67,19 @@ class OpenSet(torch.utils.data.Dataset):
         # bounding boxes
         boxes = []
         for i in range(num_object):
-            xmin = open[img_id]['annotations']['bbox'][0] * width
-            xmax = open[img_id]['annotations']['bbox'][1] * width
-            ymin = open[img_id]['annotations']['bbox'][2] * height
-            ymax = open[img_id]['annotations']['bbox'][3] * height
+            xmin = open[img_id]['annotations'][i]['bbox'][0] * width
+            xmax = open[img_id]['annotations'][i]['bbox'][1] * width
+            ymin = open[img_id]['annotations'][i]['bbox'][2] * height
+            ymax = open[img_id]['annotations'][i]['bbox'][3] * height
             boxes.append([xmin, ymin, xmax, ymax])
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         # labels
         labels = []
         for i in range(num_object):
-            labels.append(open[img_id]['annotations']['label'])
+            labels.append(self.label_to_id[open[img_id]['annotations'][i]['label']])
         labels = torch.as_tensor(labels, dtype=torch.int64)
         # tensor img_id
-        img_id = torch.tensor([img_id])
+        img_id = torch.tensor([self.image_id_to_id[img_id]])
         # size of bbox
         areas = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # iscrowd

@@ -18,10 +18,13 @@ num_workers_dl = 4
 
 # Params for training
 
-#
-num_classes = 100
-num_epochs = 5
+# coco parameters
+coco_num_classes = 100
 
+# open images parameters
+open_num_classes = 601
+
+num_epochs = 5
 lr = 0.005
 momentum = 0.9
 weight_decay = 0.005
