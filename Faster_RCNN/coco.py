@@ -36,7 +36,7 @@ class CocoSet(torch.utils.data.Dataset):
             # Tensorise img_id
             img_id = torch.tensor([img_id])
             areas = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
-            iscrowd = torch.ones((num_objs,), dtype=torch.int64)
+            iscrowd = torch.zeros((1,), dtype=torch.int64)
         else:
             # Bounding boxes for objects
             # In coco format, bbox = [xmin, ymin, width, height]

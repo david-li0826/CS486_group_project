@@ -28,12 +28,21 @@ def train_coco():
 
     torch.manual_seed(1)
     indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:500])
+    dataset_test = torch.utils.data.Subset(dataset, indices[-60:])
+    dataset = torch.utils.data.Subset(dataset, indices[:200])
 
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=config.train_batch_size,
         shuffle=config.train_shuffle_dl,
+        num_workers=config.num_workers_dl,
+        collate_fn=utils.collate_fn
+    )
+
+    dataloader_test = torch.utils.data.DataLoader(
+        dataset_test,
+        batch_size=1,
+        shuffle=False,
         num_workers=config.num_workers_dl,
         collate_fn=utils.collate_fn
     )
@@ -67,6 +76,12 @@ def train_coco():
             print_freq=50
         )
         lr_scheduler.step()
+        # evaluate on the test dataset
+        evaluator = evaluate(
+            model=model,
+            data_loader=dataloader_test,
+            device=device
+        )
 
 
 def train_open():
@@ -80,12 +95,21 @@ def train_open():
 
     torch.manual_seed(1)
     indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:500])
+    dataset_test = torch.utils.data.Subset(dataset, indices[-60:])
+    dataset = torch.utils.data.Subset(dataset, indices[:200])
 
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=config.train_batch_size,
         shuffle=config.train_shuffle_dl,
+        num_workers=config.num_workers_dl,
+        collate_fn=utils.collate_fn
+    )
+
+    dataloader_test = torch.utils.data.DataLoader(
+        dataset_test,
+        batch_size=1,
+        shuffle=False,
         num_workers=config.num_workers_dl,
         collate_fn=utils.collate_fn
     )
@@ -119,7 +143,13 @@ def train_open():
             print_freq=50
         )
         lr_scheduler.step()
+        # evaluate on the test dataset
+        evaluate(
+            model=model,
+            data_loader=dataloader_test,
+            device=device
+        )
 
 
 if __name__ == '__main__':
-    train_open()
+    train_coco()

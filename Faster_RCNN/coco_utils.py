@@ -201,7 +201,9 @@ def get_coco_api_from_dataset(dataset):
         if isinstance(dataset, torch.utils.data.Subset):
             dataset = dataset.dataset
     if isinstance(dataset, torchvision.datasets.CocoDetection):
+        print('Dataset is COCO')
         return dataset.coco
+    print('Dataset is not COCO')
     return convert_to_coco_api(dataset)
 
 

@@ -19,7 +19,7 @@ num_workers_dl = 4
 # Params for training
 
 # coco parameters
-coco_num_classes = 100
+coco_num_classes = 101
 
 # open images parameters
 open_num_classes = 601
