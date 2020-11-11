@@ -1,4 +1,5 @@
 import torch.utils.data
+import torchvision
 
 import config
 import utils

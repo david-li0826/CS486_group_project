@@ -9,6 +9,8 @@ import torchvision
 from pycocotools import mask as coco_mask
 from pycocotools.coco import COCO
 
+from tqdm import tqdm
+
 import transforms as T
 
 
@@ -148,7 +150,8 @@ def convert_to_coco_api(ds):
     ann_id = 0
     dataset = {'images': [], 'categories': [], 'annotations': []}
     categories = set()
-    for img_idx in range(len(ds)):
+    print('Convert to COCO API')
+    for img_idx in tqdm(range(len(ds)), total=len(ds)):
         # find better way to get target
         # targets = ds.get_annotations(img_idx)
         img, targets = ds[img_idx]
