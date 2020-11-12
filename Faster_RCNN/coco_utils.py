@@ -9,8 +9,6 @@ import torchvision
 from pycocotools import mask as coco_mask
 from pycocotools.coco import COCO
 
-from tqdm import tqdm
-
 import transforms as T
 
 
@@ -150,8 +148,7 @@ def convert_to_coco_api(ds):
     ann_id = 0
     dataset = {'images': [], 'categories': [], 'annotations': []}
     categories = set()
-    print('Convert to COCO API')
-    for img_idx in tqdm(range(len(ds)), total=len(ds)):
+    for img_idx in range(len(ds)):
         # find better way to get target
         # targets = ds.get_annotations(img_idx)
         img, targets = ds[img_idx]
@@ -204,9 +201,7 @@ def get_coco_api_from_dataset(dataset):
         if isinstance(dataset, torch.utils.data.Subset):
             dataset = dataset.dataset
     if isinstance(dataset, torchvision.datasets.CocoDetection):
-        print('Dataset is COCO')
         return dataset.coco
-    print('Dataset is not COCO')
     return convert_to_coco_api(dataset)
 
 
@@ -227,7 +222,7 @@ class CocoDetection(torchvision.datasets.CocoDetection):
 def get_coco(root, image_set, transforms, mode='instances'):
     anno_file_template = "{}_{}2017.json"
     PATHS = {
-        "train": ("train2017", os.path.join("annotations", anno_file_template.format(mode, "train"))),
+        "train": ("images/train2017", os.path.join("annotations", anno_file_template.format(mode, "train"))),
         "val": ("val2017", os.path.join("annotations", anno_file_template.format(mode, "val"))),
         # "train": ("val2017", os.path.join("annotations", anno_file_template.format(mode, "val")))
     }

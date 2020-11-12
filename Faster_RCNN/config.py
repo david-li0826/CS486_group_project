@@ -10,21 +10,26 @@ open_validation_data_dir = 'openimagesdata/validation'
 open_validation_ann_file = 'openimagesdata/annotations/validation-annotations-bbox.csv'
 
 # Batch size
-train_batch_size = 1
+train_batch_size = 16
 
 # Params for dataloader
 train_shuffle_dl = True
 num_workers_dl = 4
 
 # Params for training
+es_patience = 3
+detection_threshold = 0.5
 
 # coco parameters
 coco_num_classes = 101
+coco_model_path = 'models\FasterRCNN_coco'
 
 # open images parameters
 open_num_classes = 601
+open_model_path = 'models\FasterRCNN_openimages'
+open_label_col = 'LabelName'
 
-num_epochs = 5
+num_epochs = 10
 lr = 0.005
 momentum = 0.9
 weight_decay = 0.005
